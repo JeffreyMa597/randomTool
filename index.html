@@ -81,9 +81,9 @@
         placeholder="please type, every item delimited by whitespace."
       ></textarea>
       <div>
-        <div id="random-btn">开始随机</div>
-        随机个数：<input type="number" id="random-number" onchange="handleNumberChange()" />
-        <div id="reset-btn">重置</div>
+        <div id="random-btn">Start</div>
+        RandomNumber：<input type="number" id="random-number" onchange="handleNumberChange()" />
+        <div id="reset-btn">Reset</div>
       </div>
       <div id="lotterys"><div id="lottery-list"></div></div>
       <div id="results">
@@ -182,7 +182,7 @@
 
         const addResultItem = (text, index) => {
           const newDiv = document.createElement('div');
-          const newContent = document.createTextNode(`第${index + 1}轮：${text}`);
+          const newContent = document.createTextNode(`${index + 1}. ${text}`);
           newDiv.appendChild(newContent);
 
           document.getElementById('result-box').appendChild(newDiv);
