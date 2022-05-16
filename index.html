@@ -17,6 +17,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        height: 100vh;
       }
       #lottery-list {
         width: 500px;
@@ -42,9 +43,10 @@
         width: 50px;
         height: 20px;
         line-height: 20px;
+        text-align: center;
       }
       #results {
-        width: 200px;
+        width: 300px;
       }
 
       .item-cls {
@@ -62,6 +64,9 @@
       }
       .selected {
         background-color: #d9d9d9;
+      }
+      .current {
+        background-color: #ffe700d1;
       }
     </style>
   </head>
@@ -92,12 +97,13 @@
       var results = [];
 
       const addItem = function (value) {
-        const {name: text, isSelect} = value;
+        const {name: text, isSelect, isCurrent} = value;
 
         const newDiv = document.createElement('div');
         newDiv.className = 'item-cls';
 
         isSelect ? newDiv.classList.add('selected') : newDiv.classList.remove('selected');
+        isCurrent ? newDiv.classList.add('current') : newDiv.classList.remove('current');
 
         const newContent = document.createTextNode(text);
         newDiv.appendChild(newContent);
@@ -129,12 +135,17 @@
         const names = Object.values(randomObjs);
 
         if (ids?.length) {
-          alert(names);
+          // alert(names);
+
           results.push(names);
-          list = list.map((item) => ({
-            ...item,
-            isSelect: item.isSelect || ids.includes(item.id + ''),
-          }));
+          list = list.map((item) => {
+            const flag = ids.includes(item.id + '');
+            return {
+              ...item,
+              isCurrent: flag,
+              isSelect: item.isSelect || flag,
+            };
+          });
           handleResultDisplay();
           onloadList();
         }
@@ -149,6 +160,7 @@
 
         results = [];
         onloadList();
+        handleResultDisplay()
       };
 
       const handleNumberChange = () => {
@@ -189,16 +201,23 @@
         numberBox.value = 1;
         randomNumber = 1;
         results = [];
+        list = [];
 
         const el = document.getElementById('lottery-list');
         el ? el.remove() : null;
 
         const resultBox = document.getElementById('result-box');
         resultBox ? resultBox.remove() : null;
+        //const elWrap = document.getElementById('lottery-wrap');
+        //const newResultBox = document.createElement('div');
+        //newResultBox.setAttribute('id', 'result-box');
+        //elWrap.appendChild(newResultBox);
+
+        onloadList();
       };
 
       const _init = function () {
-        list = list.map((item, index) => ({...item, id: index, isSelect: false}));
+        list = list.map((item, index) => ({...item, id: index, isSelect: false, isCurrent: false}));
         onloadList();
 
         const randomBtn = document.getElementById('random-btn');
