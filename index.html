@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>随机</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+      }
+      #lottery-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #lottery-list {
+        width: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      #random-btn,
+      #reset-btn {
+        width: 100px;
+        border: 1px solid;
+        text-align: center;
+        height: 50px;
+        line-height: 50px;
+        border-radius: 10px;
+        margin: 30px;
+      }
+      #input-box {
+        margin: 30px;
+      }
+      #random-number {
+        width: 50px;
+        height: 20px;
+        line-height: 20px;
+      }
+      #results {
+        width: 200px;
+      }
+
+      .item-cls {
+        height: 30px;
+        border: 1px solid;
+        margin: 10px;
+        border-radius: 5px;
+        width: 100px;
+        text-align: center;
+        line-height: 30px;
+        padding: 0 10px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .selected {
+        background-color: #d9d9d9;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="lottery-wrap">
+      <textarea
+        name=""
+        id="input-box"
+        cols="30"
+        rows="10"
+        onchange="handleInputChange()"
+        placeholder="please type, every item delimited by whitespace."
+      ></textarea>
+      <div>
+        <div id="random-btn">开始随机</div>
+        随机个数：<input type="number" id="random-number" onchange="handleNumberChange()" />
+        <div id="reset-btn">重置</div>
+      </div>
+      <div id="lotterys"><div id="lottery-list"></div></div>
+      <div id="results">
+        <div id="result-box"></div>
+      </div>
+    </div>
+
+    <script>
+      var list = [];
+      var randomNumber = 1;
+      var results = [];
+
+      const addItem = function (value) {
+        const {name: text, isSelect} = value;
+
+        const newDiv = document.createElement('div');
+        newDiv.className = 'item-cls';
+
+        isSelect ? newDiv.classList.add('selected') : newDiv.classList.remove('selected');
+
+        const newContent = document.createTextNode(text);
+        newDiv.appendChild(newContent);
+
+        const currentDiv = document.getElementById('lottery-list');
+        currentDiv.appendChild(newDiv);
+      };
+
+      const onloadList = function () {
+        const el = document.getElementById('lottery-list');
+        el ? el.remove() : null;
+
+        const newList = document.createElement('div');
+        newList.setAttribute('id', 'lottery-list');
+        document.getElementById('lotterys').appendChild(newList);
+
+        list.forEach((item) => addItem(item));
+      };
+
+      const handleRandom = function () {
+        let randomList = list.filter(({id, isSelect}) => isSelect === false);
+
+        const _index = Math.floor(Math.random() * randomList.length);
+        randomList = randomList.sort(() => 0.5 - Math.random());
+
+        const randomResult = randomList.slice(0, randomNumber);
+        const randomObjs = randomResult.reduce((pre, cur) => ({...pre, [cur.id]: cur.name}), {});
+        const ids = Object.keys(randomObjs);
+        const names = Object.values(randomObjs);
+
+        if (ids?.length) {
+          alert(names);
+          results.push(names);
+          list = list.map((item) => ({
+            ...item,
+            isSelect: item.isSelect || ids.includes(item.id + ''),
+          }));
+          handleResultDisplay();
+          onloadList();
+        }
+      };
+
+      const handleInputChange = () => {
+        const inputBox = document.getElementById('input-box');
+        const values = inputBox.value;
+
+        const valuesArray = values?.trim()?.split(' ');
+        list = valuesArray?.map((item, index) => ({name: item, id: index, isSelect: false}));
+
+        results = [];
+        onloadList();
+      };
+
+      const handleNumberChange = () => {
+        const inputBox = document.getElementById('random-number');
+        const values = inputBox.value;
+
+        randomNumber = values;
+      };
+
+      const handleResultDisplay = () => {
+        const inputBox = document.getElementById('result-box');
+
+        inputBox ? inputBox.remove() : null;
+
+        const newResultBox = document.createElement('div');
+        newResultBox.setAttribute('id', 'result-box');
+
+        document.getElementById('results').appendChild(newResultBox);
+
+        const addResultItem = (text, index) => {
+          const newDiv = document.createElement('div');
+          const newContent = document.createTextNode(`第${index + 1}轮：${text}`);
+          newDiv.appendChild(newContent);
+
+          document.getElementById('result-box').appendChild(newDiv);
+        };
+
+        results.length &&
+          results.forEach((item, idx) => {
+            addResultItem(item, idx);
+          });
+      };
+
+      const reset = () => {
+        const inputBox = document.getElementById('input-box');
+        inputBox.value = null;
+        const numberBox = document.getElementById('random-number');
+        numberBox.value = 1;
+        randomNumber = 1;
+        results = [];
+
+        const el = document.getElementById('lottery-list');
+        el ? el.remove() : null;
+
+        const resultBox = document.getElementById('result-box');
+        resultBox ? resultBox.remove() : null;
+      };
+
+      const _init = function () {
+        list = list.map((item, index) => ({...item, id: index, isSelect: false}));
+        onloadList();
+
+        const randomBtn = document.getElementById('random-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const numberBox = document.getElementById('random-number');
+
+        numberBox.value = 1;
+        randomNumber = 1;
+        randomBtn.addEventListener('click', handleRandom, false);
+        resetBtn.addEventListener('click', reset, false);
+      };
+
+      document.body.onload = _init;
+    </script>
+  </body>
+</html>
